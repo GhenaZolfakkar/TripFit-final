@@ -8,7 +8,7 @@ class Agency extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'owned_id',
+        'owner_id',
         'agency_name',
         'logo',
         'description',

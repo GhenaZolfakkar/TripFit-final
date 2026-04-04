@@ -17,9 +17,9 @@ class AgencyForm
         return $schema
             ->components([
                 Select::make('owner_id')
-                 ->relationship('owner', 'name', fn ($query) =>$query->where('type', 'agency')
+                 ->relationship('owner', 'name', fn ($query) =>$query->where('type', 'user')
             )
-            ->searchable()
+            //->searchable()
             ->required(),
             Hidden::make('owner_id')
                 ->default(fn() => auth()->id())
