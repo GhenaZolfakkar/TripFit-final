@@ -14,7 +14,7 @@ class AgenciesTable
     {
         return $table
             ->columns([
-                TextColumn::make('owner_id')
+                TextColumn::make('owner.name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('agency_name')

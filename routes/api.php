@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AgencyInvitationController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Models\Notification;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -32,5 +34,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Delete invitation
     Route::delete('/invitations/{id}', [AgencyInvitationController::class, 'destroy']);
 
+    Route::get('/notifications', function () {
+        return auth()->user()->notifications()->latest()->get();
+    });
+
+    Route::post('/notifications/{id}/read', function ($id) {
+        $notification = Notification::findOrFail($id);
+
+        $notification->update([
+            'is_read' => true
+        ]);
+
+        return response()->json(['message' => 'Notification marked as read']);
+    });
+
 });
+
 

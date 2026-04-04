@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AgencyInvitation;
-use App\Models\User;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Notification;
 
 class AgencyInvitationController extends Controller
 {
-    // 📩 Send Invitation
+    // 📩 Send Invitation (OWNER ONLY)
     public function send(Request $request)
     {
         $request->validate([
@@ -20,23 +20,39 @@ class AgencyInvitationController extends Controller
 
         $user = auth()->user();
 
-        // Only agency can send
-        if ($user->type !== 'agency') {
+        // ❌ only owner
+        if ($user->type !== 'agency_owner') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $agencyId = $user->agency_id;
+
         $invitation = AgencyInvitation::create([
-            'agency_id' => $user->agency_id,
+            'agency_id' => $agencyId,
             'email' => $request->email,
             'token' => Str::random(40),
-            'expires_at' => Carbon::now()->addDays(2),
+            'status' => 'pending',
+            'expires_at' => now()->addDays(2),
         ]);
 
-        // 🔥 Here you can send email later
+        // check if user exists
+        $userToNotify = User::where('email', $request->email)->first();
+
+        if ($userToNotify) {
+
+            Notification::create([
+                'user_id' => $userToNotify->id,
+                'type' => 'agency_invitation',
+                'title' => 'Agency Invitation',
+                'message' => 'You received an invitation to join an agency',
+                'link' => '/accept-invitation/' . $invitation->token,
+                'is_read' => false,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Invitation sent successfully',
-            'token' => $invitation->token
+            'invitation_link' => url('/accept-invitation/' . $invitation->token)
         ]);
     }
 
@@ -59,14 +75,26 @@ class AgencyInvitationController extends Controller
 
         $user = auth()->user();
 
-        // Attach user to agency
+        if ($user->email !== $invitation->email) {
+            return response()->json(['message' => 'This invitation is not for you'], 403);
+        }
+
         $user->update([
             'agency_id' => $invitation->agency_id,
-            'type' => 'agency'
+            'type' => 'agency_member'
         ]);
 
         $invitation->update([
             'status' => 'accepted'
+        ]);
+
+        Notification::create([
+            'user_id' => $user->id,
+            'type' => 'agency_join',
+            'title' => 'Agency Joined',
+            'message' => 'You have successfully joined the agency',
+            'link' => url('/admin'),
+            'is_read' => false,
         ]);
 
         return response()->json([
@@ -74,12 +102,12 @@ class AgencyInvitationController extends Controller
         ]);
     }
 
-    // 📄 List Invitations (for agency)
+    // 📄 List Invitations (OWNER ONLY)
     public function index()
     {
         $user = auth()->user();
 
-        if ($user->type !== 'agency') {
+        if ($user->type !== 'agency_owner') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

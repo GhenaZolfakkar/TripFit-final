@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('agency_invitations', function (Blueprint $table) {
             $table->id();
 $table->foreignId('agency_id')->constrained()->cascadeOnDelete();
-$table->string('email');
-$table->string('token');
+$table->string('email')->index();
+$table->string('token')->unique();
 $table->enum('status', ['pending','accepted'])->default('pending');
 $table->timestamp('expires_at')->nullable();
 $table->timestamps();

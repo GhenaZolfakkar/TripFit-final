@@ -56,17 +56,16 @@ class User extends Authenticatable
         ];
     }
     // Agency owner
-public function agency()
-{
+    // 👑 owner
+ public function ownedAgency() {
     return $this->hasOne(Agency::class, 'owner_id');
-}
+    }
 
-// If user is agency member (optional usage)
-public function agencyProfile()
-{
-    return $this->belongsTo(Agency::class, 'agency_id');
-}
-
+    // 👥 member
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
 // User bookings
 public function bookings()
 {
@@ -79,8 +78,8 @@ public function reviews()
     return $this->hasMany(Review::class);
 }
 
-// User inquiries
-public function inquiries()
+    // User inquiries
+    /*public function inquiries()
 {
     return $this->hasMany(Inquiry::class);
 }
@@ -93,5 +92,9 @@ public function chats()
 public function canAccessPanel(Panel $panel): bool
 {
     return in_array($this->type, ['admin','agency']);
-}
+}*/
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }
