@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Models\Notification;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\TripCategoryController;
+use App\Http\Controllers\Api\ChatbotController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -73,5 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
+
+Route::post('/chatbot', [ChatbotController::class, 'ask']);
 
 
