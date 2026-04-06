@@ -14,7 +14,7 @@ class Trip extends Model
         'destination',
         'price',
         'duration',
-        'max_traveler',
+        'max_travelers',
         'start_date',
         'end_date',
         'rating',
@@ -27,6 +27,8 @@ class Trip extends Model
         'price' => 'decimal:2',
         'rating' => 'decimal:1',
         'featured' => 'boolean',
+        'images' => 'array',
+        'videos' => 'array',
     ];
     public function agency()
 {
