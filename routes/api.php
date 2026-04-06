@@ -62,6 +62,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
+Route::middleware('auth:sanctum')->group(function () {
 
+    Route::prefix('trip-categories')->group(function () {
+        // 📄 Get all categories
+        Route::get('/list', [TripCategoryController::class, 'index']);
+
+        // 🔍 Get category by ID
+        Route::get('/{id}', [TripCategoryController::class, 'show']);
+    });
+
+});
 
 
