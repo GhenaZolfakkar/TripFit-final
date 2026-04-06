@@ -15,27 +15,41 @@ class TripController extends Controller
     // =======================
     // GET ALL TRIPS
     // =======================
-    public function index()
-    {
-        $trips = Trip::with('agency')
-            ->where('agency_id', $this->agencyId())
-            ->get();
+   public function index()
+{
+    $user = auth()->user();
 
-        return response()->json($trips);
+    // ✅ user & admin يشوفوا كل التريبس
+    if (in_array($user->type, ['admin', 'user'])) {
+        $trips = Trip::with('agency')->get();
+    } else {
+        // ✅ owner & member يشوفوا بتاعتهم بس
+        $trips = Trip::with('agency')
+            ->where('agency_id', $user->agency_id)
+            ->get();
     }
+
+    return response()->json($trips);
+}
 
     // =======================
     // SHOW
     // =======================
-    public function show($id)
-    {
-        $trip = Trip::with('agency')
-            ->where('id', $id)
-            ->where('agency_id', $this->agencyId())
-            ->firstOrFail();
+   public function show($id)
+{
+    $user = auth()->user();
 
-        return response()->json($trip);
+    $query = Trip::with('agency')->where('id', $id);
+
+    // لو مش admin أو user → فلترة
+    if (!in_array($user->type, ['admin', 'user'])) {
+        $query->where('agency_id', $user->agency_id);
     }
+
+    $trip = $query->firstOrFail();
+
+    return response()->json($trip);
+}
 
     // =======================
     // STORE
@@ -68,35 +82,25 @@ class TripController extends Controller
         ], 201);
     }
 
-    // =======================
-    // UPDATE
-    // =======================
     public function update(Request $request, $id)
     {
-        $trip = Trip::where('id', $id)
-            ->where('agency_id', $this->agencyId())
-            ->firstOrFail();
+        $user = $this->user();
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'destination' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'duration' => 'required|integer|min:1',
-            'max_traveler' => 'required|integer|min:1',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'rating' => 'nullable|numeric|min:0|max:5',
-            'trip_category_id' => 'required|exists:trip_categories,id',
-            'status' => 'required|string',
-            'featured' => 'nullable|boolean',
-        ]);
+        if (in_array($user->type, ['user', 'agency_owner'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
 
-        $validated['featured'] = $request->has('featured');
+        $query = Trip::where('id', $id);
 
-        $trip->update($validated);
+        if ($user->type !== 'admin') {
+            $query->where('agency_id', $user->agency_id);
+        }
 
-        return response()->json(['message' => 'Updated successfully']);
+        $trip = $query->firstOrFail();
+
+        $trip->update($request->all());
+
+        return response()->json(['message' => 'Updated']);
     }
 
     // =======================
@@ -104,12 +108,22 @@ class TripController extends Controller
     // =======================
     public function destroy($id)
     {
-        $trip = Trip::where('id', $id)
-            ->where('agency_id', $this->agencyId())
-            ->firstOrFail();
+        $user = $this->user();
+
+        if (in_array($user->type, ['user', 'agency_owner'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $query = Trip::where('id', $id);
+
+        if ($user->type !== 'admin') {
+            $query->where('agency_id', $user->agency_id);
+        }
+
+        $trip = $query->firstOrFail();
 
         $trip->delete();
 
-        return response()->json(['message' => 'Deleted successfully']);
+        return response()->json(['message' => 'Deleted']);
     }
 }

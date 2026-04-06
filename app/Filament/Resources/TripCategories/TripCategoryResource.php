@@ -27,7 +27,17 @@ class TripCategoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'TripCategory';
 
+ public static function getActions(): array
+    {
+        // Only admin can see "Create" button
+        if (auth()->user()->type !== 'admin') {
+            return [];
+        }
  
+        return [
+            ActionsCreateAction::make(),
+        ];
+    }
 
    public static function canCreate(): bool
 {

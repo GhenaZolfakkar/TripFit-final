@@ -7,46 +7,55 @@ use App\Models\TripCategory;
 
 class TripCategoryController extends Controller
 {
+    private function user()
+    {
+        return auth()->user();
+    }
+
     public function index()
     {
-        return response()->json(TripCategory::all());
+        return TripCategory::all();
     }
 
     public function store(Request $request)
     {
+        $user = $this->user();
+
+        if ($user->type === 'agency_owner') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $category = TripCategory::create($validated);
-
-        return response()->json($category, 201);
-    }
-
-    public function show($id)
-    {
-        return response()->json(
-            TripCategory::findOrFail($id)
-        );
+        return TripCategory::create($validated);
     }
 
     public function update(Request $request, $id)
     {
+        $user = $this->user();
+
+        if ($user->type === 'agency_owner') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $category = TripCategory::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $category->update($validated);
+        $category->update($request->all());
 
         return response()->json(['message' => 'Updated']);
     }
 
     public function destroy($id)
     {
+        $user = $this->user();
+
+        if ($user->type === 'agency_owner') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         TripCategory::findOrFail($id)->delete();
 
         return response()->json(['message' => 'Deleted']);

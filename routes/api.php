@@ -47,7 +47,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
         return response()->json(['message' => 'Notification marked as read']);
     });
+Route::middleware('auth:sanctum')->group(function () {
+
+    // TRIPS
+    Route::prefix('trips')->group(function () {
+        Route::get('/', [TripController::class, 'index']);
+        Route::get('/{id}', [TripController::class, 'show']);
+        Route::post('/', [TripController::class, 'store']);
+        Route::put('/{id}', [TripController::class, 'update']);
+        Route::delete('/{id}', [TripController::class, 'destroy']);
+    });
 
 });
+
 
 
