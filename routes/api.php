@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AgencyInvitationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Models\Notification;
+use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\Api\TripCategoryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -46,14 +48,15 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
 
         return response()->json(['message' => 'Notification marked as read']);
-    });
+    }); 
+ });
 Route::middleware('auth:sanctum')->group(function () {
 
     // TRIPS
     Route::prefix('trips')->group(function () {
-        Route::get('/', [TripController::class, 'index']);
+        Route::get('/list', [TripController::class, 'index']);
         Route::get('/{id}', [TripController::class, 'show']);
-        Route::post('/', [TripController::class, 'store']);
+        Route::post('/store', [TripController::class, 'store']);
         Route::put('/{id}', [TripController::class, 'update']);
         Route::delete('/{id}', [TripController::class, 'destroy']);
     });
