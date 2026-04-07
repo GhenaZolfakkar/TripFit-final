@@ -20,4 +20,4 @@ COPY . .
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Serve app
-CMD php artisan serve --host=0.0.0.0 --port=$PORT --public=public
+CMD php -S 0.0.0.0:$PORT -t public
