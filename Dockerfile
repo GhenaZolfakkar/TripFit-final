@@ -38,8 +38,6 @@ COPY . .
 # ------------------------
 # Copy production env
 # ------------------------
-COPY .env.production .env
-
 # ------------------------
 # Install PHP dependencies
 # ------------------------
