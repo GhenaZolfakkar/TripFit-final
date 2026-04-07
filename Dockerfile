@@ -58,9 +58,5 @@ RUN chown -R www-data:www-data /var/www/html \
 # ------------------------
 # Expose port for Railway
 # ------------------------
-EXPOSE 8080
-
-# ------------------------
-# Start PHP-FPM
-# ------------------------
-CMD ["php-fpm"]
+EXPOSE $PORT
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
