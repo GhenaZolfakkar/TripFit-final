@@ -1,16 +1,68 @@
-FROM php:8.2-cli
+# ------------------------
+# Base Image
+# ------------------------
+FROM php:8.2-fpm
 
+# ------------------------
+# Set working directory
+# ------------------------
+WORKDIR /var/www/html
+
+# ------------------------
+# Install system dependencies
+# ------------------------
 RUN apt-get update && apt-get install -y \
-    git unzip curl libicu-dev libzip-dev zip
+    git \
+    unzip \
+    curl \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    npm \
+    && docker-php-ext-install intl pdo_mysql mbstring zip exif pcntl gd
 
-RUN docker-php-ext-install intl pdo pdo_mysql zip
+# ------------------------
+# Install Composer
+# ------------------------
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /app
-
+# ------------------------
+# Copy application files
+# ------------------------
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# ------------------------
+# Copy production env
+# ------------------------
+COPY .env.production .env
 
-CMD php -S 0.0.0.0:$PORT -t public
+# ------------------------
+# Install PHP dependencies
+# ------------------------
+RUN composer install --optimize-autoloader --no-dev --no-interaction
+
+# ------------------------
+# Install Node dependencies for Vite
+# ------------------------
+RUN npm install && npm run build
+
+# ------------------------
+# Permissions for Laravel
+# ------------------------
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
+# ------------------------
+# Expose port for Railway
+# ------------------------
+EXPOSE 8080
+
+# ------------------------
+# Start PHP-FPM
+# ------------------------
+CMD ["php-fpm"]
