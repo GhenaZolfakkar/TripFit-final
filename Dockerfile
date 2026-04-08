@@ -1,36 +1,71 @@
-FROM php:8.2-cli
+# ------------------------
+# Base Image with Apache
+# ------------------------
+FROM php:8.2-apache
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    git unzip curl zip \
-    libzip-dev libonig-dev libxml2-dev libicu-dev \
-    npm \
-    && docker-php-ext-install intl pdo_mysql zip bcmath opcache
-
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
+# ------------------------
+# Set working directory
+# ------------------------
 WORKDIR /var/www/html
 
+# ------------------------
+# Install system dependencies
+# ------------------------
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    npm \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install intl pdo_mysql mbstring zip exif pcntl gd \
+    && a2enmod rewrite
+
+# ------------------------
+# Install Composer
+# ------------------------
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+
+# ------------------------
+# Copy application files
+# ------------------------
 COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# ------------------------
+# Install PHP dependencies
+# ------------------------
+RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# Build frontend
+# ------------------------
+# Install Node dependencies for Vite
+# ------------------------
 RUN npm install && npm run build
 
-# Laravel cache
-RUN php artisan config:clear \
-    && php artisan cache:clear \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# ------------------------
+# Permissions for Laravel
+# ------------------------
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Permissions
-RUN chmod -R 775 storage bootstrap/cache
+# ------------------------
+# Expose port for Apache
+# ------------------------
+EXPOSE 8080
 
-EXPOSE 8000
+# ------------------------
+# Configure Apache to listen on 8080
+# ------------------------
+RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
+    && sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:8080>/' /etc/apache2/sites-available/000-default.conf
 
-# ✅ THIS IS THE IMPORTANT PART
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
+# ------------------------
+# Start Apache
+# ------------------------
+CMD ["apache2-foreground"]
