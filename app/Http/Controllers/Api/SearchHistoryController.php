@@ -13,9 +13,8 @@ class SearchHistoryController extends Controller
         return auth()->user();
     }
 
-    // =========================
-    // 📄 GET MY HISTORY
-    // =========================
+    
+   
     public function index()
     {
         $user = $this->user();
@@ -27,9 +26,7 @@ class SearchHistoryController extends Controller
         return response()->json($history);
     }
 
-    // =========================
-    // ➕ STORE SEARCH
-    // =========================
+  
     public function store(Request $request)
     {
         $user = $this->user();
@@ -51,9 +48,7 @@ class SearchHistoryController extends Controller
         ], 201);
     }
 
-    // =========================
-    // ❌ DELETE ONE
-    // =========================
+    
     public function destroy($id)
     {
         $user = $this->user();
@@ -67,9 +62,7 @@ class SearchHistoryController extends Controller
         return response()->json(['message' => 'Deleted successfully']);
     }
 
-    // =========================
-    // 🧹 CLEAR ALL
-    // =========================
+   
     public function clear()
     {
         $user = $this->user();
