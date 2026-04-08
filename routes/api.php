@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\TripCategoryController;
 use App\Http\Controllers\Api\ChatbotController;
+use App\Http\Controllers\Api\SearchHistoryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -77,4 +78,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/chatbot', [ChatbotController::class, 'ask']);
 
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::prefix('search-history')->group(function () {
+
+        Route::get('/list', [SearchHistoryController::class, 'index']);
+        Route::post('/store', [SearchHistoryController::class, 'store']);
+        Route::delete('/{id}', [SearchHistoryController::class, 'destroy']);
+        Route::delete('/', [SearchHistoryController::class, 'clear']);
+
+    });
+
+});
 
