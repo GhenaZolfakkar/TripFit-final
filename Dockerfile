@@ -33,4 +33,4 @@ RUN chmod -R 775 storage bootstrap/cache
 EXPOSE 8000
 
 # ✅ THIS IS THE IMPORTANT PART
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
