@@ -30,7 +30,7 @@ return new class extends Migration
     $table->foreignId('trip_category_id')->constrained()->cascadeOnDelete();
     $table->foreignId('agency_id')->constrained()->cascadeOnDelete();
 
-    $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+    $table->enum('status', ['active' , 'inactive'])->default('inactive');
     $table->boolean('featured')->default(false);
 
     $table->timestamps();

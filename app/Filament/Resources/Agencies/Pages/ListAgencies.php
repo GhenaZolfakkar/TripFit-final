@@ -20,12 +20,11 @@ class ListAgencies extends ListRecords
 {
     $user = auth()->user();
 
-    if ($user->type === 'admin') {
+    if ($user->type === 'admin' || $user->type === 'agency_owner') {
         return [];
     }
-
-    return [
-        CreateAction::make(),
+ return [
+        ActionsCreateAction::make(),
     ];
 }
 

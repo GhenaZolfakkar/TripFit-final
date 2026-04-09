@@ -14,18 +14,16 @@ class TripController extends Controller
         return auth()->user()->agency_id;
     }
  
-    // =======================
-    // GET ALL TRIPS
-    // =======================
+
    public function index()
 {
     $user = auth()->user();
  
-    // ✅ user & admin يشوفوا كل التريبس
+    
     if (in_array($user->type, ['admin', 'user'])) {
         $trips = Trip::with('agency')->get();
     } else {
-        // ✅ owner  يشوفوا بتاعتهم بس
+        
         $trips = Trip::with('agency')
             ->where('agency_id', $user->agency_id)
             ->get();
@@ -34,16 +32,14 @@ class TripController extends Controller
     return response()->json($trips);
 }
  
-    // =======================
-    // SHOW
-    // =======================
+   
    public function show($id)
 {
     $user = auth()->user();
  
     $query = Trip::with('agency')->where('id', $id);
  
-    // لو مش admin أو user → فلترة
+    
     if (!in_array($user->type, ['admin', 'user'])) {
         $query->where('agency_id', $user->agency_id);
     }
@@ -53,9 +49,7 @@ class TripController extends Controller
     return response()->json($trip);
 }
  
-    // =======================
-    // STORE
-    // =======================
+ 
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -105,9 +99,6 @@ class TripController extends Controller
         return response()->json(['message' => 'Updated']);
     }
  
-    // =======================
-    // DELETE
-    // =======================
     public function destroy($id)
     {
         $user = $this->user();

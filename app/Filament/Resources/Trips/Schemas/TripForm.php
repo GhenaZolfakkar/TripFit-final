@@ -70,8 +70,8 @@ Select::make('agency_id')
     ->visible(fn () => auth()->user()->type === 'admin')
     ->required(fn () => auth()->user()->type === 'admin'),
             Select::make('status')
-                    ->options(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'])
-                    ->default('pending')
+                    ->options(['active' => 'Active', 'inactive' => 'InActive'])
+                    ->default('inactive')
                     ->required(),
             Toggle::make('featured')
                     ->required(),

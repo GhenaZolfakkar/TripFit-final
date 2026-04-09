@@ -71,7 +71,7 @@ class AgencyForm
                 Textarea::make('contact_details'),
 
                 // 📄 Business License
-                TextInput::make('business_license')
+                FileUpload::make('business_license')
                     ->nullable(),
 
                 // 🔗 Documentation

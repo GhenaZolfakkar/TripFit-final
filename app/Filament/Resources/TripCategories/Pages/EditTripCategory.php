@@ -16,4 +16,5 @@ class EditTripCategory extends EditRecord
             DeleteAction::make(),
         ];
     }
+    
 }

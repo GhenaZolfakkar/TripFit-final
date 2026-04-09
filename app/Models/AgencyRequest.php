@@ -38,7 +38,7 @@ class AgencyRequest extends Model
         protected static function booted()
     {
         static::updated(function ($request) {
-            // Only trigger when status changes to approved
+            
             if ($request->wasChanged('status') && $request->status === 'approved') {
                 DB::transaction(function () use ($request) {
 
@@ -76,6 +76,18 @@ class AgencyRequest extends Model
                     );
                 });
             }
+            if ($request->wasChanged('status') && $request->status === 'rejected') {
+                $feedback = $request->rejection_feedback ?? "Unfortunately, your agency request did not meet our requirements. Please review your information and try again or contact support for more details.";
+
+                Mail::raw(
+                    "Hello {$request->name},\n\nYour agency request has been rejected.\n\nReason: {$feedback}\n\nThank you for your understanding.",
+                    function ($message) use ($request) {
+                        $message->to($request->email)
+                            ->subject('Agency Request Rejected');
+                    }
+                );
+            }
         });
+        
     }
 }

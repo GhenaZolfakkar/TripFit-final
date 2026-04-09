@@ -45,7 +45,7 @@ class AgencyResource extends Resource
             
             $query->where('id', $user->agency_id);
         } elseif ($user->type !== 'admin') {
-            // Other users see nothing
+            
             $query->whereRaw('0 = 1');
         }
 

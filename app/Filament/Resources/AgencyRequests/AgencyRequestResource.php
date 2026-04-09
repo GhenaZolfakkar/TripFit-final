@@ -22,6 +22,11 @@ class AgencyRequestResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'AgencyRequest';
 
+    public static function canViewAny(): bool
+{
+    return auth()->user()?->type === 'admin';
+}
+
     public static function form(Schema $schema): Schema
     {
         return AgencyRequestForm::configure($schema);
