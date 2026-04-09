@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\TripCategoryController;
 use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\SearchHistoryController;
 use App\Http\Controllers\Api\AgencyRequestController;
+use App\Http\Controllers\Api\FaqController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -92,3 +93,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 Route::post('/agency-request', [AgencyRequestController::class, 'store']);
+
+Route::get('/faqs', [FaqController::class, 'index']);
+Route::get('/faqs/{id}', [FaqController::class, 'show']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/faqs', [FaqController::class, 'store']);
+    Route::put('/faqs/{id}', [FaqController::class, 'update']);
+    Route::delete('/faqs/{id}', [FaqController::class, 'destroy']);
+    
+    });
