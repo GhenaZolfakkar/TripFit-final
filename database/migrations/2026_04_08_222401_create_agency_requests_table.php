@@ -12,9 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('agency_requests', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+    $table->string('name');
+    $table->string('middle_name')->nullable();
+    $table->string('last_name')->nullable();
+    $table->string('phone')->nullable();
+    $table->date('date_of_birth')->nullable();
+    $table->string('email')->unique();
+    $table->string('password');
+
+    $table->string('agency_name');
+    $table->string('logo')->nullable();
+    $table->text('description')->nullable();
+    $table->string('website')->nullable();
+    $table->decimal('commission_rate', 5, 2)->default(0);
+    $table->text('contact_details')->nullable();
+    $table->string('business_license')->nullable();
+    $table->string('documentation_url')->nullable();
+
+    $table->enum('status', ['pending', 'approved', 'rejected'])
+          ->default('pending');
+
+    $table->timestamps();
+});
     }
 
     /**

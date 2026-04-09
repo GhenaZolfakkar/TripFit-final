@@ -9,9 +9,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -55,16 +56,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    // Agency owner
-    // 👑 owner
+  
  public function ownedAgency() {
     return $this->hasOne(Agency::class, 'owner_id');
     }
 
-    public function agency()
-    {
-        return $this->belongsTo(Agency::class, 'agency_id');
-    }
+   public function isAdmin()
+{
+    return $this->type === 'admin';
+}
+
+public function isAgencyOwner()
+{
+    return $this->type === 'agency_owner';
+}
 // User bookings
 public function bookings()
 {
@@ -87,11 +92,14 @@ public function reviews()
 public function chats()
 {
     return $this->hasMany(ChatMessage::class);
-}
-public function canAccessPanel(Panel $panel): bool
-{
-    return in_array($this->type, ['admin','agency']);
 }*/
+public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->type, [
+            'admin',
+            'agency_owner',
+        ]);
+    }
     public function notifications()
     {
         return $this->hasMany(Notification::class);

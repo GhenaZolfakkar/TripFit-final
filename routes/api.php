@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\TripCategoryController;
 use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\SearchHistoryController;
+use App\Http\Controllers\Api\AgencyRequestController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -90,4 +91,4 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
-
+Route::post('/agency-request', [AgencyRequestController::class, 'store']);

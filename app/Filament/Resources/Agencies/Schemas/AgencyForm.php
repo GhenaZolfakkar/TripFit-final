@@ -29,7 +29,7 @@ class AgencyForm
     )
     ->preload()
     ->required()
-    ->visible(fn() => auth()->user()->type === 'admin'),
+    ->disabled(fn() => auth()->user()->type === 'admin'),
 
                 // 👤 AUTO OWNER (لو مش admin)
                 Hidden::make('owner_id')

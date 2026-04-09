@@ -16,16 +16,18 @@ class ListAgencies extends ListRecords
     protected static string $resource = AgencyResource::class;
 
     // Top-right header actions (Create button)
-    protected function getHeaderActions(): array
-    {
-        if (auth()->user()->type !== 'admin') {
-            return []; // hide Create button for non-admins
-        }
+ protected function getHeaderActions(): array
+{
+    $user = auth()->user();
 
-        return [
-            ActionsCreateAction::make(), // admin sees the Create button
-        ];
+    if ($user->type === 'admin') {
+        return [];
     }
+
+    return [
+        CreateAction::make(),
+    ];
+}
 
     // Row-level actions (Edit/Delete per record)
     protected function getTableActions(): array
