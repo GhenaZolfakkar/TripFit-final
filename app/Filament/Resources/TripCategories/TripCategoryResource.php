@@ -43,7 +43,7 @@ class TripCategoryResource extends Resource
 {
     $user = auth()->user();
 
-    return in_array($user->type, ['admin', 'agency_member']);
+    return in_array($user->type, ['admin']);
 }
 
   public static function canEdit(Model $record): bool
@@ -52,9 +52,7 @@ class TripCategoryResource extends Resource
 
     if ($user->type === 'admin') return true;
 
-    if ($user->type === 'agency_member') {
-        return true;
-    }
+  
 
     return false; // owner ممنوع
 }
@@ -65,9 +63,6 @@ class TripCategoryResource extends Resource
 
     if ($user->type === 'admin') return true;
 
-    if ($user->type === 'agency_member') {
-        return true;
-    }
 
     return false;
 }

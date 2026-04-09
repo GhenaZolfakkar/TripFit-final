@@ -41,8 +41,8 @@ class AgencyResource extends Resource
 
         $user = auth()->user();
 
-        if ($user->type === 'agency_member' || $user->type === 'agency_owner') {
-            // Only the agency where this member belongs
+        if ($user->type === 'agency_owner') {
+            
             $query->where('id', $user->agency_id);
         } elseif ($user->type !== 'admin') {
             // Other users see nothing

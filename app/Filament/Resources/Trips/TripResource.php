@@ -43,7 +43,7 @@ public static function canCreate(): bool
 {
     $user = auth()->user();
 
-    return in_array($user->type, ['admin', 'agency_member']);
+    return in_array($user->type, ['admin']);
 }
 
 public static function canEdit(Model $record): bool
@@ -52,9 +52,6 @@ public static function canEdit(Model $record): bool
 
     if ($user->type === 'admin') return true;
 
-    if ($user->type === 'agency_member' && $record->agency_id === $user->agency_id) {
-        return true;
-    }
 
     return false;
 }
@@ -66,9 +63,6 @@ public static function canDelete(Model $record): bool
 
     if ($user->type === 'admin') return true;
 
-    if ($user->type === 'agency_member' && $record->agency_id === $user->agency_id) {
-        return true;
-    }
 
     return false;
 }

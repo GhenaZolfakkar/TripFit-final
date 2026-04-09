@@ -25,7 +25,7 @@ class TripController extends Controller
     if (in_array($user->type, ['admin', 'user'])) {
         $trips = Trip::with('agency')->get();
     } else {
-        // ✅ owner & member يشوفوا بتاعتهم بس
+        // ✅ owner  يشوفوا بتاعتهم بس
         $trips = Trip::with('agency')
             ->where('agency_id', $user->agency_id)
             ->get();

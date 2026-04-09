@@ -61,7 +61,6 @@ class User extends Authenticatable
     return $this->hasOne(Agency::class, 'owner_id');
     }
 
-    // 👥 member
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id');

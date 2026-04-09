@@ -47,12 +47,6 @@ class Agency extends Model
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    // 👥 members
-    public function members()
-    {
-        return $this->hasMany(User::class, 'agency_id');
-    }
-
     // ✈️ trips
     public function trips()
     {

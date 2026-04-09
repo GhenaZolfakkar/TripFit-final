@@ -19,20 +19,10 @@ protected function getHeaderActions(): array
         return [];
     }
 
-    // ✅ admin + member → يظهر زرار Create
     return [
         CreateAction::make(),
     ];
 }
-   /* protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make(),
-        ];
-    }*/
-  /*  protected function canCreate(): bool
-{
-    return in_array(auth()->user()->type, ['admin', 'agency_member']);
-}*/
+
 
 }
