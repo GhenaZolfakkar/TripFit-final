@@ -45,8 +45,11 @@ class TripController extends Controller
     }
  
     $trip = $query->firstOrFail();
- 
-    return response()->json($trip);
+
+        return response()->json([
+            'trip' => $trip,
+            'remaining_seats' => $trip->remainingSeats()
+        ]);
 }
  
  

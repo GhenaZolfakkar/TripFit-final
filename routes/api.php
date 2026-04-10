@@ -10,8 +10,10 @@ use App\Http\Controllers\Api\TripCategoryController;
 use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\SearchHistoryController;
 use App\Http\Controllers\Api\AgencyRequestController;
+use App\Http\Controllers\Api\BookingController as ApiBookingController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\InquiryController;
+use App\Http\Controllers\Api\BookingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -93,3 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/inquiries', [InquiryController::class, 'index']);
 Route::get('/inquiries/{id}', [InquiryController::class, 'show']);
 Route::patch('/inquiries/{id}', [InquiryController::class, 'update']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/trips/{trip}/book', [BookingController::class, 'store']);
+    Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm']);
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+});

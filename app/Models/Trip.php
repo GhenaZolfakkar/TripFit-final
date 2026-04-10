@@ -39,13 +39,11 @@ class Trip extends Model
         return $this->belongsTo(TripCategory::class,'trip_category_id');
     }
  
-    // Trip has many images
     public function images()
     {
         return $this->hasMany(TripImage::class);
     }
  
-    // Trip has many services
     public function services()
     {
         return $this->hasMany(TripService::class);
@@ -59,6 +57,16 @@ public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
+public function bookedTravelers()
+    {
+        return $this->bookings()
+            ->where('status', 'confirmed')
+            ->sum('traveler_count');
+    }
+public function remainingSeats()
+    {
+        return $this->max_travelers - $this->bookedTravelers();
+    }
 
 
 }
