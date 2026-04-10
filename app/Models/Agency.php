@@ -15,8 +15,6 @@ class Agency extends Model
         'logo',
         'description',
         'website',
-
-        // new fields
         'commission_rate',
         'rating',
         'contact_details',
@@ -25,7 +23,6 @@ class Agency extends Model
         'verification_status',
     ];
 
-    // 🔥 AUTO تحويل اليوزر لـ owner
     protected static function booted()
     {
         static::created(function ($agency) {
@@ -41,13 +38,13 @@ class Agency extends Model
         });
     }
 
-    // 👤 owner
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    // ✈️ trips
+  
     public function trips()
     {
         return $this->hasMany(Trip::class);

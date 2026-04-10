@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\AgencyInvitationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Models\Notification;
 use App\Http\Controllers\Api\TripController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Api\ChatbotController;
 use App\Http\Controllers\Api\SearchHistoryController;
 use App\Http\Controllers\Api\AgencyRequestController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\InquiryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,19 +27,6 @@ Route::prefix('auth')->group(function () {
     });
 });
 Route::middleware('auth:sanctum')->group(function () {
-
-    // Send invitation
-    Route::post('/invitations/send', [AgencyInvitationController::class, 'send']);
-
-    // Accept invitation
-    Route::post('/invitations/accept/{token}', [AgencyInvitationController::class, 'accept']);
-
-    // List invitations
-    Route::get('/invitations', [AgencyInvitationController::class, 'index']);
-
-    // Delete invitation
-    Route::delete('/invitations/{id}', [AgencyInvitationController::class, 'destroy']);
-
     Route::get('/notifications', function () {
         return auth()->user()->notifications()->latest()->get();
     });
@@ -56,7 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
  });
 Route::middleware('auth:sanctum')->group(function () {
 
-    // TRIPS
     Route::prefix('trips')->group(function () {
         Route::get('/list', [TripController::class, 'index']);
         Route::get('/{id}', [TripController::class, 'show']);
@@ -69,10 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('trip-categories')->group(function () {
-        // 📄 Get all categories
         Route::get('/list', [TripCategoryController::class, 'index']);
 
-        // 🔍 Get category by ID
         Route::get('/{id}', [TripCategoryController::class, 'show']);
     });
 
@@ -104,3 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/faqs/{id}', [FaqController::class, 'destroy']);
     
     });
+
+ Route::post('/inquiries', [InquiryController::class, 'store']);
+Route::get('/inquiries', [InquiryController::class, 'index']);
+Route::get('/inquiries/{id}', [InquiryController::class, 'show']);
+Route::patch('/inquiries/{id}', [InquiryController::class, 'update']);
