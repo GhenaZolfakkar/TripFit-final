@@ -21,18 +21,13 @@ return new class extends Migration
 
     $table->integer('duration');
     $table->integer('max_travelers');
-
     $table->date('start_date');
     $table->date('end_date');
-
-    $table->decimal('rating', 2, 1)->nullable();
-
+    $table->decimal('rating', 3, 2)->default(0);
     $table->foreignId('trip_category_id')->constrained()->cascadeOnDelete();
     $table->foreignId('agency_id')->constrained()->cascadeOnDelete();
-
     $table->enum('status', ['active' , 'inactive'])->default('inactive');
     $table->boolean('featured')->default(false);
-
     $table->timestamps();
 });
     }

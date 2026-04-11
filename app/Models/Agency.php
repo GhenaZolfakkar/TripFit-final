@@ -49,4 +49,8 @@ class Agency extends Model
     {
         return $this->hasMany(Trip::class);
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

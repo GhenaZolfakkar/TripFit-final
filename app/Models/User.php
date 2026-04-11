@@ -70,25 +70,25 @@ public function isAgencyOwner()
 {
     return $this->type === 'agency_owner';
 }
-// User bookings
+
 public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
 
-// User reviews
+
 public function reviews()
 {
     return $this->hasMany(Review::class);
 }
 
-    // User inquiries
-    /*public function inquiries()
+
+public function inquiries()
 {
     return $this->hasMany(Inquiry::class);
 }
 
-// Chat messages
+/*/ Chat messages
 public function chats()
 {
     return $this->hasMany(ChatMessage::class);

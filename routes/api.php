@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\BookingController as ApiBookingController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\ReviewController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -100,4 +101,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/trips/{trip}/book', [BookingController::class, 'store']);
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm']);
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+});
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/reviews', [ReviewController::class, 'store']);
 });
