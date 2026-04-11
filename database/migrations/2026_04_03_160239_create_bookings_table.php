@@ -16,15 +16,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('trip_id')->constrained()->cascadeOnDelete();
             $table->foreignId('agency_id')->constrained()->cascadeOnDelete();
-
             $table->integer('traveler_count');
-
             $table->decimal('price_per_person', 10, 2);
             $table->decimal('total_price', 10, 2);
-
             $table->decimal('commission_rate', 5, 2);
             $table->decimal('commission_amount', 10, 2);
-
             $table->enum('status', [
                 'pending',
                 'confirmed',

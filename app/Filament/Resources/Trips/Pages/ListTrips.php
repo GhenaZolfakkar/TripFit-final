@@ -10,10 +10,16 @@ class ListTrips extends ListRecords
 {
     protected static string $resource = TripResource::class;
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make(),
-        ];
+   protected function getHeaderActions(): array
+{
+    $user = auth()->user();
+
+    if ($user->type === 'admin') {
+        return [];
     }
+
+    return [
+        CreateAction::make(),
+    ];
+}
 }

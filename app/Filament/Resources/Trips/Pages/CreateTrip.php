@@ -12,7 +12,6 @@ protected function mutateFormDataBeforeCreate(array $data): array
 {
     $user = auth()->user();
 
-    // لو مش admin → يتحط agency_id بتاعه تلقائي
     if ($user->type !== 'admin') {
         $data['agency_id'] = $user->agency_id;
     }

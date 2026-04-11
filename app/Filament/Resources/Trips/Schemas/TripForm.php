@@ -63,7 +63,7 @@ class TripForm
 
    Select::make('trip_category_id')
                 ->label('Category')
-                ->relationship('category', 'name') // category name will appear
+                ->relationship('category', 'name') 
                 ->required(),
 Select::make('agency_id')
     ->relationship('agency', 'agency_name')
