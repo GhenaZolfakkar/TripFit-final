@@ -37,10 +37,10 @@ class TripsTable
                 TextColumn::make('rating')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('trip_category_id')
+                TextColumn::make('category.name')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('agency_id')
+                TextColumn::make('agency.agency_name')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
