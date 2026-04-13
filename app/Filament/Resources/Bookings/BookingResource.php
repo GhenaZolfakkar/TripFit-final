@@ -36,7 +36,10 @@ class BookingResource extends Resource
     
     return $query->where('agency_id', $user->agency_id);
 }
-
+public static function afterSave(Booking $record): void
+{
+    $record->tryConfirm();
+}
     public static function form(Schema $schema): Schema
     {
         return BookingForm::configure($schema);

@@ -6,19 +6,26 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Trip;
 use App\Models\Booking;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Payment;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
+
     public function store(Request $request, $tripId)
     {
-
         $request->validate([
             'traveler_count' => 'required|integer|min:1'
         ]);
 
-        $trip = Trip::with('agency')->findOrFail($tripId);
+        $trip = Trip::findOrFail($tripId);
+
+        if ($trip->status !== 'active') {
+            return response()->json(['message' => 'Trip not active'], 400);
+        }
+
         $remainingSeats = $trip->remainingSeats();
 
         if ($request->traveler_count > $remainingSeats) {
@@ -28,110 +35,123 @@ class BookingController extends Controller
             ], 400);
         }
 
-        if ($trip->status != 'active') {
-            return response()->json([
-                'message' => 'Trip not active'
-            ], 400);
-        }
-
-        $currentTravelers = $trip->bookedTravelers();
-
-        if (($currentTravelers + $request->traveler_count) > $trip->max_travelers) {
-            return response()->json([
-                'message' => 'Trip is full'
-            ], 400);
-        }
-
         $pricePerPerson = $trip->price;
-
         $totalPrice = $pricePerPerson * $request->traveler_count;
 
-        $commissionRate = $trip->agency->commission_rate;
+        $tier = $trip->tier;
+        $config = config("commission.$tier");
 
-        $commissionAmount = ($totalPrice * $commissionRate) / 100;
+        $agencyRate = $config['agency_rate'];
+        $customerFee = $config['customer_fee'];
+
+        $agencyCommission = ($totalPrice * $agencyRate) / 100;
+        $customerFeeAmount = ($totalPrice * $customerFee) / 100;
+
+        $finalPrice = $totalPrice + $customerFeeAmount;
 
         $booking = Booking::create([
-
             'user_id' => Auth::id(),
             'trip_id' => $trip->id,
             'agency_id' => $trip->agency_id,
-
             'traveler_count' => $request->traveler_count,
-
             'price_per_person' => $pricePerPerson,
             'total_price' => $totalPrice,
+            'agency_commission_rate' => $agencyRate,
+            'agency_commission_amount' => $agencyCommission,
+            'customer_fee_rate' => $customerFee,
+            'customer_fee_amount' => $customerFeeAmount,
+            'final_price' => $finalPrice,
+            'status' => 'pending',
+            'payment_status' => 'unpaid'
+        ]);
 
-            'commission_rate' => $commissionRate,
-            'commission_amount' => $commissionAmount,
-
-            'status' => 'pending'
-
+        Notification::create([
+            'user_id' => Auth::id(),
+            'title' => 'Booking Created',
+            'type' => 'booking',
+            'message' => 'Booking created. Please proceed to payment.',
+            'link' => '/bookings/' . $booking->id
         ]);
 
         return response()->json([
-            'message' => 'Booking request sent',
+            'message' => 'Booking created successfully',
             'booking' => $booking
         ]);
     }
 
-    public function confirm($id)
+    public function paymentSummary($id)
     {
-
-        $booking = Booking::with('trip', 'user')->findOrFail($id);
-
-        $trip = $booking->trip;
-
-        $currentTravelers = $trip->bookedTravelers();
-
-        if (($currentTravelers + $booking->traveler_count) > $trip->max_travelers) {
-            return response()->json([
-                'message' => 'Trip capacity exceeded'
-            ], 400);
-        }
-
-        $booking->update([
-            'status' => 'confirmed'
-        ]);
-
-        Notification::create([
-
-            'user_id' => $booking->user_id,
-
-            'title' => 'Booking Confirmed',
-
-            'type' => 'booking',
-
-            'message' => 'Your booking for trip ' . $trip->title . ' has been confirmed',
-
-            'link' => '/bookings/' . $booking->id
-
-        ]);
+        $booking = Booking::with('trip')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
 
         return response()->json([
-            'message' => 'Booking confirmed'
+            'booking_id' => $booking->id,
+            'trip_title' => $booking->trip->title,
+            'traveler_count' => $booking->traveler_count,
+            'price_per_person' => $booking->price_per_person,
+            'total_price' => $booking->total_price,
+            'service_fee' => $booking->customer_fee_amount,
+            'final_price' => $booking->final_price,
+            'payment_status' => $booking->payment_status
         ]);
     }
 
     public function cancel($id)
     {
-
-        $booking = Booking::with('trip')->findOrFail($id);
+        $booking = Booking::with('trip')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
 
         $booking->update([
             'status' => 'cancelled'
         ]);
 
         Notification::create([
-
             'user_id' => $booking->user_id,
             'title' => 'Booking Cancelled',
             'type' => 'booking',
-            'message' => 'Your booking for trip ' . $booking->trip->title . ' has been cancelled',
+            'message' => 'Your booking has been cancelled',
             'link' => '/bookings/' . $booking->id
         ]);
 
         return response()->json([
             'message' => 'Booking cancelled'
+        ]);
+    }
+
+    public function myBookings()
+    {
+        return Booking::where('user_id', auth()->id())
+            ->with(['trip', 'payment'])
+            ->latest()
+            ->get();
+    }
+
+    public function approve($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if ($booking->payment_status !== 'paid') {
+            return response()->json([
+                'message' => 'Cannot approve unpaid booking'
+            ], 400);
+        }
+
+        $booking->update([
+            'status' => 'approved'
+        ]);
+
+        Notification::create([
+            'user_id' => $booking->user_id,
+            'title' => 'Booking Approved',
+            'type' => 'booking',
+            'message' => 'Your booking has been approved',
+            'link' => '/bookings/' . $booking->id
+        ]);
+
+        return response()->json([
+            'message' => 'Booking approved'
         ]);
     }
 }

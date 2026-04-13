@@ -55,6 +55,12 @@ class AuthController extends Controller
                 'message' => 'Invalid credentials'
             ], 401);
         }
+
+        if (auth()->user()->status === 'blocked') {
+    return response()->json([
+        'message' => 'Your account is blocked'
+    ], 403);
+}
  
         $token = $user->createToken("auth_token")->plainTextToken;
  

@@ -10,6 +10,7 @@ use Filament\Forms\Components\Hidden;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
 
+
 class AgencyForm
 {
     public static function configure(Schema $schema): Schema
@@ -26,7 +27,7 @@ class AgencyForm
     )
     ->preload()
     ->required()
-    ->disabled(fn() => auth()->user()->type === 'admin'),
+    ->disabled(),
 
                 
                 Hidden::make('owner_id')
@@ -51,12 +52,6 @@ class AgencyForm
                     ->url()
                     ->nullable(),
 
-            
-                TextInput::make('commission_rate')
-                    ->numeric()
-                    ->default(0)
-                    ->suffix('%'),
-
                 
                 TextInput::make('rating')
                     ->numeric()
@@ -67,7 +62,8 @@ class AgencyForm
 
             
                 FileUpload::make('business_license')
-                    ->nullable(),
+                    ->nullable()
+                    ->disabled(),
 
     
                 TextInput::make('documentation_url')
@@ -82,7 +78,8 @@ class AgencyForm
                         'rejected' => 'Rejected',
                     ])
                     ->default('pending')
-                    ->visible(fn() => auth()->user()->type === 'admin'),
+                    ->visible(fn() => auth()->user()->type === 'admin')
+                    ->disabled(),
             ]);
     }
 }

@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
 
 class UsersTable
 {
@@ -33,6 +34,14 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('type')
                     ->badge(),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->colors([
+                          'success' => 'active',
+                          'warning' => 'suspended',
+                        'danger' => 'blocked',
+    ]),    
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -48,9 +57,39 @@ class UsersTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
-            ])
+            ->actions([
+
+    Action::make('activate')
+        ->label('Activate')
+        ->color('success')
+        ->visible(fn ($record) => $record->status !== 'active')
+        ->action(function ($record) {
+            $record->update([
+                'status' => 'active',
+            ]);
+        }),
+
+        Action::make('suspend')
+        ->label('Suspend')
+        ->color('warning')
+        ->visible(fn ($record) => $record->status !== 'suspended')
+        ->action(function ($record) {
+            $record->update([
+                'status' => 'suspended',
+            ]);
+        }),
+
+    Action::make('block')
+        ->label('Block')
+        ->color('danger')
+        ->visible(fn ($record) => $record->status !== 'blocked')
+        ->requiresConfirmation() 
+        ->action(function ($record) {
+            $record->update([
+                'status' => 'blocked',
+            ]);
+        }),
+])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -30,12 +30,12 @@ public static function getEloquentQuery(): Builder
     $query = parent::getEloquentQuery();
     $user = auth()->user();
 
-    // admin يشوف الكل
+    
     if ($user->type === 'admin') {
         return $query;
     }
 
-    // باقي الناس يشوفوا trips بتاعت agency بتاعتهم بس
+    
     return $query->where('agency_id', $user->agency_id);
 }
 

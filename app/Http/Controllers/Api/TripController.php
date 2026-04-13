@@ -28,8 +28,20 @@ class TripController extends Controller
             ->where('agency_id', $user->agency_id)
             ->get();
     }
- 
+ $tierOrder = [
+        'basic' => 1,
+        'premium' => 2,
+        'exclusive' => 3,
+    ];
+
+    $userTierLevel = $tierOrder[$user->tier];
+
+    $trips = $query->get()->filter(function ($trip) use ($tierOrder, $userTierLevel) {
+        return $tierOrder[$trip->tier] <= $userTierLevel;
+    })->values();
+
     return response()->json($trips);
+    
 }
  
    

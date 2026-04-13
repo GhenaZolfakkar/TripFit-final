@@ -14,7 +14,7 @@ use Filament\Panel;
 
 class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<UserFactory> */
+    
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -32,6 +32,8 @@ class User extends Authenticatable implements FilamentUser
         'agency_id',
         'email',
         'password',
+        'tier',
+        'status',
     ];
 
     /**
@@ -103,5 +105,41 @@ public function canAccessPanel(Panel $panel): bool
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function isBasic()
+    {
+        return $this->tier === 'basic';
+    }
+
+    public function isPremium()
+    {
+        return $this->tier === 'premium';
+    }
+
+    public function isExclusive()
+    {
+        return $this->tier === 'exclusive';
+    }
+
+    public function tierLevel(): int
+    {
+        return match ($this->tier) {
+            'basic' => 1,
+            'premium' => 2,
+            'exclusive' => 3,
+            default => 1,
+        };
+    }
+
+
+    public function agencyRate(): float
+    {
+        return config("tiers.{$this->tier}.agency_rate");
+    }
+
+    public function customerFee(): float
+    {
+        return config("tiers.{$this->tier}.customer_fee");
     }
 }

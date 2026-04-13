@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\UserController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,6 +31,8 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });
+Route::middleware('auth:sanctum')->post('/user/select-tier',[UserController::class, 'selectTier']
+);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', function () {
         return auth()->user()->notifications()->latest()->get();
@@ -98,11 +102,23 @@ Route::get('/inquiries/{id}', [InquiryController::class, 'show']);
 Route::patch('/inquiries/{id}', [InquiryController::class, 'update']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/trips/{trip}/book', [BookingController::class, 'store']);
-    Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm']);
-    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+    Route::post('/trips/{tripId}/book', [BookingController::class, 'store']);
+    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
+    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+    Route::get('/bookings/{id}/payment-summary', [BookingController::class, 'paymentSummary']);
+    Route::post('/bookings/{id}/payment/initiate', [PaymentController::class, 'initiate']);
+    Route::post('/bookings/{id}/pay', [PaymentController::class, 'pay']);
 });
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/reviews', [ReviewController::class, 'store']);
+});
+Route::get('/trips/{trip_id}/reviews', [ReviewController::class, 'tripReviews']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/payment-history', [PaymentController::class, 'paymentHistory']);
+    Route::post('/bookings/{id}/refund-request', [PaymentController::class, 'requestRefund']);
+    Route::get('/my-refund-requests', [PaymentController::class, 'myRefundRequests']);
+    Route::get('/refund-requests/{id}', [PaymentController::class, 'showRefund']);
+
 });

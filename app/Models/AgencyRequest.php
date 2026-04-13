@@ -59,7 +59,6 @@ class AgencyRequest extends Model
                         'logo' => $request->logo,
                         'description' => $request->description,
                         'website' => $request->website,
-                        'commission_rate' => $request->commission_rate,
                         'contact_details' => $request->contact_details,
                         'business_license' => $request->business_license,
                         'documentation_url' => $request->documentation_url,

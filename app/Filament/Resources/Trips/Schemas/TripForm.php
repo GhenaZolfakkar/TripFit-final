@@ -18,6 +18,13 @@ class TripForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
+            Select::make('tier')
+    ->options([
+        'basic' => 'Basic',
+        'premium' => 'Premium (Featured)',
+        'exclusive' => 'Exclusive Deal'
+    ])
+    ->required(),
             TextInput::make('title')
                 ->label('Trip Title')
                 ->required()

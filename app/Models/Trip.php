@@ -21,7 +21,8 @@ class Trip extends Model
         'trip_category_id',
         'agency_id',
         'status',
-        'featured'
+        'featured',
+        'tier'
     ];
     protected $casts = [
         'price' => 'decimal:2',

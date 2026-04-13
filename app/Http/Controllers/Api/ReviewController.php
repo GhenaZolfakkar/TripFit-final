@@ -11,7 +11,18 @@ use App\Models\User;
 
 class ReviewController extends Controller
 {
+public function tripReviews($trip_id)
+{
+    $reviews = Review::where('trip_id', $trip_id)
+        ->with('user:id,name')
+        ->latest()
+        ->get();
 
+    return response()->json([
+        'trip_id' => $trip_id,
+        'reviews' => $reviews
+    ]);
+}
     public function store(Request $request)
     {
 

@@ -29,7 +29,7 @@ class TripCategoryResource extends Resource
 
  public static function getActions(): array
     {
-        // Only admin can see "Create" button
+    
         if (auth()->user()->type !== 'admin') {
             return [];
         }
@@ -54,7 +54,7 @@ class TripCategoryResource extends Resource
 
   
 
-    return false; // owner ممنوع
+    return false; 
 }
 
  public static function canDelete(Model $record): bool
@@ -67,10 +67,9 @@ class TripCategoryResource extends Resource
     return false;
 }
 
-    // No restriction on listing categories
    public static function getEloquentQuery(): Builder
 {
-    return parent::getEloquentQuery(); // everyone sees all categories
+    return parent::getEloquentQuery(); 
 }
 
 

@@ -18,7 +18,7 @@ class AgencyRequestForm
                     ->label('First Name')
                     ->required()
                     ->maxLength(255)
-                    ->disabled(), // agency_owner can't edit names
+                    ->disabled(), 
                 TextInput::make('email')
                     ->label('Email')
                     ->email()
@@ -46,11 +46,6 @@ class AgencyRequestForm
                     ->label('Website')
                     ->url()
                     ->disabled(fn() => auth()->user()->type !== 'agency_owner'),
-                TextInput::make('commission_rate')
-                    ->label('Commission Rate')
-                    ->numeric()
-                    ->default(0)
-                    ->disabled(fn() => auth()->user()->type !== 'agency_owner'),
                 Textarea::make('contact_details')
                     ->label('Contact Details')
                     ->disabled(fn() => auth()->user()->type !== 'agency_owner'),
@@ -58,9 +53,9 @@ class AgencyRequestForm
                     ->label('Business License')
                     ->directory('licenses')
                     ->disabled(),
-                FileUpload::make('documentation_url')
-                    ->label('Documentation URL')
-                    ->directory('documentation')
+                TextInput::make('documentation_url')
+                    ->url()
+                    ->nullable()
                     ->disabled(),
                 Select::make('status')
                     ->label('Status')

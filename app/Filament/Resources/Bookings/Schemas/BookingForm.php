@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Bookings\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TextColumn;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Placeholder;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Trip;
+use Filament\Forms\Components\Toggle;
 
 class BookingForm
 {
@@ -39,25 +41,33 @@ class BookingForm
                     ->disabled(),
  
                 TextInput::make('price_per_person')
-                    ->prefix('$')
+                    ->prefix('EGP')
                     ->disabled(),
  
-                TextInput::make('total_price')
-                    ->prefix('$')
-                    ->disabled(),
  
-                TextInput::make('commission_rate')
+                TextInput::make('agency_commission_rate')
                     ->suffix('%')
                     ->disabled(),
  
-                TextInput::make('commission_amount')
-                    ->prefix('$')
-                    ->disabled(),
- 
+
                 Placeholder::make('remaining_seats')
                     ->label('Remaining Seats')
                     ->content(fn ($record) => $record?->trip?->remainingSeats() ?? '-'),
- 
+ Placeholder::make('total_price')
+    ->label('Trip Price')
+    ->content(fn ($record) => $record?->total_price . ' EGP'),
+
+Placeholder::make('agency_commission_amount')
+    ->label('Platform Commission')
+    ->content(fn ($record) => '- ' . $record?->agency_commission_amount . ' EGP'),
+
+Placeholder::make('agency_earnings')
+    ->label('Your Earnings')
+    ->content(fn ($record) => $record?->agency_earnings . ' EGP'),
+
+Placeholder::make('final_price')
+    ->label('Customer Paid')
+    ->content(fn ($record) => $record?->final_price . ' EGP'),
                 Select::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -65,9 +75,10 @@ class BookingForm
                         'cancelled' => 'Rejected',
                     ])
                     ->default('pending')
-                    ->disabled(fn () => Auth::user()->type === 'admin')
+                    ->disabled()
                     ->required(),
- 
+                
             ]);
+
     }
 }

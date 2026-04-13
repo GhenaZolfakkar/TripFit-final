@@ -26,6 +26,7 @@ return new class extends Migration
     $table->decimal('rating', 3, 2)->default(0);
     $table->foreignId('trip_category_id')->constrained()->cascadeOnDelete();
     $table->foreignId('agency_id')->constrained()->cascadeOnDelete();
+    $table->enum('tier', ['basic', 'premium', 'exclusive'])->default('basic');
     $table->enum('status', ['active' , 'inactive'])->default('inactive');
     $table->boolean('featured')->default(false);
     $table->timestamps();

@@ -20,16 +20,13 @@ return new class extends Migration
     $table->date('date_of_birth')->nullable();
     $table->string('email')->unique();
     $table->string('password');
-
     $table->string('agency_name');
     $table->string('logo')->nullable();
     $table->text('description')->nullable();
     $table->string('website')->nullable();
-    $table->decimal('commission_rate', 5, 2)->default(0);
     $table->text('contact_details')->nullable();
     $table->string('business_license')->nullable();
     $table->string('documentation_url')->nullable();
-
     $table->enum('status', ['pending', 'approved', 'rejected'])
           ->default('pending');
 
