@@ -22,6 +22,14 @@ class Agency extends Model
         'documentation_url',
         'verification_status',
     ];
+    protected $hidden = [
+    'owner_id',
+    'business_license',
+    'documentation_url',
+    'verification_status',
+    'created_at',
+    'updated_at',
+];
 
     protected static function booted()
     {

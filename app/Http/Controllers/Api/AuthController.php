@@ -20,6 +20,7 @@ class AuthController extends Controller
         'password' => 'required|min:8|confirmed',
         'phone' => 'required',
         'date_of_birth' => 'nullable|date',
+        
     ]);
  
     $user = User::create([
@@ -30,7 +31,8 @@ class AuthController extends Controller
         'password' => Hash::make($request->password),
         'phone' => $request->phone,
         'date_of_birth' => $request->date_of_birth,
-        'account_type' => $request->account_type
+        'account_type' => $request->account_type,
+        'status' => 'active',
     ]);
  
     $token = $user->createToken("auth_token")->plainTextToken;
@@ -41,34 +43,40 @@ class AuthController extends Controller
     ]);
 }
  
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
- 
-        $user = User::where('email', $request->email)->first();
- 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
+   public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        if (auth()->user()->status === 'blocked') {
-    return response()->json([
-        'message' => 'Your account is blocked'
-    ], 403);
-}
- 
-        $token = $user->createToken("auth_token")->plainTextToken;
- 
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
         return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
+            'message' => 'Invalid credentials'
+        ], 401);
     }
+
+    if ($user->status === 'blocked') {
+        return response()->json([
+            'message' => 'Your account is blocked'
+        ], 403);
+    }
+
+    if ($user->status !== 'active') {
+        return response()->json([
+            'message' => 'Your account is not active'
+        ], 403);
+    }
+
+    $token = $user->createToken("auth_token")->plainTextToken;
+
+    return response()->json([
+        'user' => $user,
+        'token' => $token
+    ]);
+}
  
     public function logout(Request $request)
     {

@@ -15,53 +15,51 @@ class TripController extends Controller
     }
  
 
-   public function index()
+public function index()
 {
     $user = auth()->user();
- 
-    
-    if (in_array($user->type, ['admin', 'user'])) {
-        $trips = Trip::with('agency')->get();
-    } else {
-        
-        $trips = Trip::with('agency')
-            ->where('agency_id', $user->agency_id)
-            ->get();
-    }
- $tierOrder = [
-        'basic' => 1,
-        'premium' => 2,
-        'exclusive' => 3,
-    ];
 
-    $userTierLevel = $tierOrder[$user->tier];
+    $query = Trip::with('agency');
 
-    $trips = $query->get()->filter(function ($trip) use ($tierOrder, $userTierLevel) {
-        return $tierOrder[$trip->tier] <= $userTierLevel;
-    })->values();
-
-    return response()->json($trips);
-    
-}
- 
-   
-   public function show($id)
-{
-    $user = auth()->user();
- 
-    $query = Trip::with('agency')->where('id', $id);
- 
-    
     if (!in_array($user->type, ['admin', 'user'])) {
         $query->where('agency_id', $user->agency_id);
     }
+
+    if ($user->tier !== 'exclusive') {
+        $query->where('tier', '!=', 'exclusive');
+    }
+
+    $trips = $query->get();
+
+    return response()->json([
+        'trips' => $trips,
+        'user_tier' => $user->tier
+    ]);
+}
  
+   
+  public function show($id)
+{
+    $user = auth()->user();
+
+    $query = Trip::with('agency')->where('id', $id);
+
+    if (!in_array($user->type, ['admin', 'user'])) {
+        $query->where('agency_id', $user->agency_id);
+    }
+
     $trip = $query->firstOrFail();
 
+    if ($trip->tier === 'exclusive' && $user->tier !== 'exclusive') {
         return response()->json([
-            'trip' => $trip,
-            'remaining_seats' => $trip->remainingSeats()
-        ]);
+            'message' => 'This trip is available only for exclusive users'
+        ], 403);
+    }
+
+    return response()->json([
+        'trip' => $trip,
+        'remaining_seats' => $trip->remainingSeats()
+    ]);
 }
  
  
@@ -134,4 +132,56 @@ class TripController extends Controller
  
         return response()->json(['message' => 'Deleted']);
     }
+
+    public function premiumFeaturedTrips()
+{
+    $user = auth()->user();
+
+    if (!in_array($user->tier, ['premium', 'exclusive'])) {
+        return response()->json([
+            'message' => 'This section is available for premium users only.'
+        ], 403);
+    }
+
+    $trips = Trip::with('agency')
+        ->where('status', 'active')
+        ->where('featured', true)
+        ->get()
+        ->map(function ($trip) use ($user) {
+
+            $score = 0;
+
+            $score += 50;
+
+            if ($user->tier === 'premium') {
+                $score += 20;
+            }
+
+            if ($user->tier === 'exclusive') {
+                $score += 30;
+            }
+
+            $trip->priority_exposure = [
+                'homepage_boost' => true,
+                'top_search_placement' => true,
+                'recommended_section' => true,
+            ];
+
+            $trip->score = $score;
+
+            return $trip;
+        })
+        ->sortByDesc('score')
+        ->values();
+
+    return response()->json([
+        'type' => 'premium_featured',
+        'message' => 'These featured trips reflect your premium priority exposure across homepage, search, and recommendations.',
+        'explanation' => [
+            'As a premium user, you get higher visibility for featured trips.',
+            'These trips are boosted across homepage, search results, and recommendations.'
+        ],
+        'trips' => $trips
+    ]);
+}
 }

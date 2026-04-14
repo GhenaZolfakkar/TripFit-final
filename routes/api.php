@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RecommendationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -55,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [TripController::class, 'show']);
         Route::post('/store', [TripController::class, 'store']);
         Route::put('/{id}', [TripController::class, 'update']);
+        Route::get('/premium/featured-trips', [TripController::class, 'premiumFeaturedTrips']);
         Route::delete('/{id}', [TripController::class, 'destroy']);
     });
 
@@ -121,4 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-refund-requests', [PaymentController::class, 'myRefundRequests']);
     Route::get('/refund-requests/{id}', [PaymentController::class, 'showRefund']);
 
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/recommendations', [RecommendationController::class, 'recommend']);
 });
