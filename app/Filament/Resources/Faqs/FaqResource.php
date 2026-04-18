@@ -7,7 +7,7 @@ use App\Filament\Resources\Faqs\Pages\EditFaq;
 use App\Filament\Resources\Faqs\Pages\ListFaqs;
 use App\Filament\Resources\Faqs\Schemas\FaqForm;
 use App\Filament\Resources\Faqs\Tables\FaqsTable;
-use App\Models\Faq;
+use App\Models\FAQ;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
