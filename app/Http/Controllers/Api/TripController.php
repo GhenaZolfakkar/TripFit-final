@@ -82,6 +82,27 @@ public function index()
  
         $validated['agency_id'] = $this->agencyId();
         $validated['featured'] = $request->has('featured');
+        
+    if ($request->has('images')) {
+        $images = [];
+
+        foreach ($request->file('images') as $image) {
+            $images[] = base64_encode(file_get_contents($image));
+        }
+
+        $validated['images'] = $images;
+    }
+
+    if ($request->has('videos')) {
+        $videos = [];
+
+        foreach ($request->file('videos') as $video) {
+            $videos[] = base64_encode(file_get_contents($video));
+        }
+
+        $validated['videos'] = $videos;
+    }
+
  
         $trip = Trip::create($validated);
  
