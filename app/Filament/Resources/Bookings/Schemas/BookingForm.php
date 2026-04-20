@@ -46,7 +46,6 @@ class BookingForm
  
  
                 TextInput::make('agency_commission_rate')
-                    ->suffix('%')
                     ->disabled(),
  
 
