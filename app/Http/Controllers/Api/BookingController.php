@@ -41,11 +41,11 @@ class BookingController extends Controller
         $tier = $trip->tier;
         $config = config("commission.$tier");
 
-        $agencyRate = $config['agency_rate'];
+        $agencyRate = $config['agency_commission'];
         $customerFee = $config['customer_fee'];
 
-        $agencyCommission = ($totalPrice * $agencyRate) / 100;
-        $customerFeeAmount = ($totalPrice * $customerFee) / 100;
+        $agencyCommission = $totalPrice * $agencyRate;
+        $customerFeeAmount = $totalPrice * $customerFee;
 
         $finalPrice = $totalPrice + $customerFeeAmount;
 

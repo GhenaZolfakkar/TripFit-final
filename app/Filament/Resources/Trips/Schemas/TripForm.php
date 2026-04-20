@@ -87,11 +87,11 @@ Select::make('agency_id')
                   ->multiple()
                   ->image()
                ->disk('public')
-                ->directory('trips'),
+                ->storeFiles(false),
                  FileUpload::make('videos')
                  ->multiple()
                 ->disk('public')
-                ->directory('trips'),
+                ->storeFiles(false),
             Repeater::make('services')
                   ->relationship('services')
                   ->schema([
