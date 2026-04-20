@@ -22,7 +22,9 @@ class Trip extends Model
         'agency_id',
         'status',
         'featured',
-        'tier'
+        'tier',
+        'images',
+        'videos'
     ];
     protected $casts = [
         'price' => 'decimal:2',
@@ -38,11 +40,6 @@ class Trip extends Model
     public function category()
     {
         return $this->belongsTo(TripCategory::class,'trip_category_id');
-    }
- 
-    public function images()
-    {
-        return $this->hasMany(TripImage::class);
     }
  
     public function services()
