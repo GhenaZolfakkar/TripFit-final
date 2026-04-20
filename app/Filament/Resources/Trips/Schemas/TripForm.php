@@ -86,12 +86,10 @@ Select::make('agency_id')
             FileUpload::make('images')
                   ->multiple()
                   ->image()
-                 ->storeFiles(false)
-                 ->dehydrated(false),
+                 ->storeFiles(false),
                  FileUpload::make('videos')
     ->multiple()
-   ->storeFiles(false)
-    ->dehydrated(false),
+   ->storeFiles(false),
             Repeater::make('services')
                   ->relationship('services')
                   ->schema([
