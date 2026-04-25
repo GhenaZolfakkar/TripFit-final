@@ -19,35 +19,6 @@ class CreateTrip extends CreateRecord
         $data['agency_id'] = $user->agency_id;
     }
 
-    if (!empty($data['images'])) {
-        $images = [];
-
-        foreach ($data['images'] as $file) {
-
-            if ($file instanceof UploadedFile) {
-                $uploaded = Cloudinary::upload($file->getRealPath());
-                $images[] = $uploaded->getSecurePath();
-            }
-        }
-
-        $data['images'] = $images;
-    }
-
-  
-    if (!empty($data['videos'])) {
-        $videos = [];
-
-        foreach ($data['videos'] as $file) {
-
-            if ($file instanceof UploadedFile) {
-                $uploaded = Cloudinary::uploadVideo($file->getRealPath());
-                $videos[] = $uploaded->getSecurePath();
-            }
-        }
-
-        $data['videos'] = $videos;
-    }
-
     return $data;
 }
 
