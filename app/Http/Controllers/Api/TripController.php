@@ -63,75 +63,101 @@ public function index()
 }
  
  
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'destination' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'duration' => 'required|integer|min:1',
-            'max_traveler' => 'required|integer|min:1',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'rating' => 'nullable|numeric|min:0|max:5',
-            'trip_category_id' => 'required|exists:trip_categories,id',
-            'status' => 'required|string',
-            'featured' => 'nullable|boolean',
-        ]);
- 
-        $validated['agency_id'] = $this->agencyId();
-        $validated['featured'] = $request->has('featured');
-        
-    if ($request->has('images')) {
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'tier' => 'required|in:basic,premium,exclusive',
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'destination' => 'required|string|max:255',
+        'price' => 'required|numeric|min:0',
+        'duration' => 'required|integer|min:1',
+        'max_travelers' => 'required|integer|min:1',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'rating' => 'nullable|numeric|min:0|max:5',
+        'trip_category_id' => 'required|exists:trip_categories,id',
+        'status' => 'required|in:active,inactive',
+        'featured' => 'nullable|boolean',
+        'images.*' => 'nullable|file|image',
+        'videos.*' => 'nullable|file',
+        'services' => 'nullable|array',
+        'services.*.service_name' => 'required_with:services|string',
+        'services.*.type' => 'required_with:services|in:included,not_included',
+    ]);
+
+    $validated['agency_id'] = $this->agencyId();
+    $validated['featured'] = $request->boolean('featured');
+
+    
+    if ($request->hasFile('images')) {
         $images = [];
-
         foreach ($request->file('images') as $image) {
-            $images[] = base64_encode(file_get_contents($image));
+            $images[] = $image->store('trips/images', 'public');
         }
-
         $validated['images'] = $images;
     }
 
-    if ($request->has('videos')) {
+   
+    if ($request->hasFile('videos')) {
         $videos = [];
-
         foreach ($request->file('videos') as $video) {
-            $videos[] = base64_encode(file_get_contents($video));
+            $videos[] = $video->store('trips/videos', 'public');
         }
-
         $validated['videos'] = $videos;
     }
 
- 
-        $trip = Trip::create($validated);
- 
-        return response()->json([
-            'message' => 'Trip created successfully',
-            'data' => $trip
-        ], 201);
+    $trip = Trip::create($validated);
+
+   
+    if (!empty($validated['services'])) {
+        foreach ($validated['services'] as $service) {
+            $trip->services()->create($service);
+        }
     }
+
+    return response()->json([
+        'message' => 'Trip created successfully',
+        'data' => $trip->load('services')
+    ], 201);
+}
  
     public function update(Request $request, $id)
-    {
-        $user = $this->user();
- 
-        if (in_array($user->type, ['user', 'agency_owner'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
- 
-        $query = Trip::where('id', $id);
- 
-        if ($user->type !== 'admin') {
-            $query->where('agency_id', $user->agency_id);
-        }
- 
-        $trip = $query->firstOrFail();
- 
-        $trip->update($request->all());
- 
-        return response()->json(['message' => 'Updated']);
+{
+    $user = $this->user();
+
+    if (in_array($user->type, ['user', 'agency_owner'])) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    $query = Trip::where('id', $id);
+
+    if ($user->type !== 'admin') {
+        $query->where('agency_id', $user->agency_id);
+    }
+
+    $trip = $query->firstOrFail();
+
+    $validated = $request->validate([
+        'tier' => 'sometimes|in:basic,premium,exclusive',
+        'title' => 'sometimes|string|max:255',
+        'description' => 'sometimes|string',
+        'destination' => 'sometimes|string|max:255',
+        'price' => 'sometimes|numeric|min:0',
+        'duration' => 'sometimes|integer|min:1',
+        'max_travelers' => 'sometimes|integer|min:1',
+        'start_date' => 'sometimes|date',
+        'end_date' => 'sometimes|date|after_or_equal:start_date',
+        'rating' => 'nullable|numeric|min:0|max:5',
+        'trip_category_id' => 'sometimes|exists:trip_categories,id',
+        'status' => 'sometimes|in:active,inactive',
+        'featured' => 'nullable|boolean',
+    ]);
+
+    $trip->update($validated);
+
+    return response()->json(['message' => 'Updated']);
+}
  
     public function destroy($id)
     {
