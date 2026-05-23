@@ -24,9 +24,9 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN npm install && npm run build
 
-RUN php artisan storage:link || true
-RUN php artisan filament:assets || true
+RUN php artisan filament:assets
+RUN php artisan storage:link
 
 EXPOSE 8080
 
-CMD php artisan config:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+CMD php artisan storage:link && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
