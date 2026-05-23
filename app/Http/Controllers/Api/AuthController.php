@@ -22,7 +22,6 @@ class AuthController extends Controller
         'date_of_birth' => 'nullable|date',
         
     ]);
- 
     $user = User::create([
         'name' => $request->name,
         'middle_name' => $request->middle_name,
