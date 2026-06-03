@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\RefundController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RecommendationController;
 
@@ -32,8 +33,13 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });
-Route::middleware('auth:sanctum')->post('/user/select-tier',[UserController::class, 'selectTier']
-);
+Route::middleware('auth:sanctum')->post('/user/select-tier',[UserController::class, 'selectTier']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::put('/users/{id}/activate', [UserController::class, 'activate']);
+    Route::put('/users/{id}/suspend', [UserController::class, 'suspend']);
+    Route::put('/users/{id}/block', [UserController::class, 'block']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', function () {
         return auth()->user()->notifications()->latest()->get();
@@ -65,7 +71,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('trip-categories')->group(function () {
         Route::get('/list', [TripCategoryController::class, 'index']);
-
+        Route::post('/add',[TripCategoryController::class,'store']);
+        Route::put('/update/{id}',[TripCategoryController::class,'update']);
+        Route::delete('/delete/{id}',[TripCategoryController::class,'destory']);
         Route::get('/{id}', [TripCategoryController::class, 'show']);
     });
 
@@ -86,9 +94,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 Route::post('/agency-request', [AgencyRequestController::class, 'store']);
+Route::put('/agency-requests/{id}/approve', [AgencyRequestController::class, 'approve']);
+Route::put('/agency-requests/{id}/reject', [AgencyRequestController::class, 'reject']);
 
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/faqs/{id}', [FaqController::class, 'show']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
 

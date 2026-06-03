@@ -45,4 +45,40 @@ class AgencyRequestController extends Controller
             'data' => $agencyRequest,
         ]);
     }
+    public function approve($id)
+{
+    $agencyRequest = AgencyRequest::findOrFail($id);
+
+    if ($agencyRequest->status !== 'pending') {
+        return response()->json([
+            'message' => 'This request has already been processed.'
+        ], 400);
+    }
+
+    $agencyRequest->update([
+        'status' => 'approved'
+    ]);
+
+    return response()->json([
+        'message' => 'Agency request approved successfully.'
+    ]);
+}
+public function reject($id)
+{
+    $agencyRequest = AgencyRequest::findOrFail($id);
+
+    if ($agencyRequest->status !== 'pending') {
+        return response()->json([
+            'message' => 'This request has already been processed.'
+        ], 400);
+    }
+
+    $agencyRequest->update([
+        'status' => 'rejected'
+    ]);
+
+    return response()->json([
+        'message' => 'Agency request rejected successfully.'
+    ]);
+}
 }
