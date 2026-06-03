@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\RefundController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RecommendationController;
 
@@ -131,8 +130,8 @@ Route::get('/trips/{trip_id}/reviews', [ReviewController::class, 'tripReviews'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/payment-history', [PaymentController::class, 'paymentHistory']);
     Route::post('/bookings/{id}/refund-request', [PaymentController::class, 'requestRefund']);
-     Route::post('/refunds/{refundId}/approve', [RefundController::class, 'approveRefund']);
-    Route::post('/refunds/{refundId}/reject', [RefundController::class, 'rejectRefund']);
+     Route::post('/refunds/{refundId}/approve', [PaymentController::class, 'approveRefund']);
+    Route::post('/refunds/{refundId}/reject', [PaymentController::class, 'rejectRefund']);
     Route::get('/my-refund-requests', [PaymentController::class, 'myRefundRequests']);
     Route::get('/refund-requests/{id}', [PaymentController::class, 'showRefund']);
 
